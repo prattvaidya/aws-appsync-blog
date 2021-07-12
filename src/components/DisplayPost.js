@@ -45,7 +45,7 @@ export const DisplayPosts = () => {
             <p>{post.postBody}</p>
             <span>
                 <DeletePost id={post.id} />
-                <EditPost />
+                <EditPost {...post} />
             </span>
         </div>)}
     </div>
