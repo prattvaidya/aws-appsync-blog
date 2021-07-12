@@ -1,16 +1,22 @@
-import { API, graphqlOperation } from 'aws-amplify'
+import { API, Auth, graphqlOperation } from 'aws-amplify'
 import React, { useEffect, useState } from 'react'
 import { createPost } from '../graphql/mutations'
 
 export const CreatePost = () => {
 
     const [postOwnerId, setPostOwnerId] = useState('')
-    const [postOwnerUsername, setpostOwnerUserna] = useState('')
+    const [postOwnerUsername, setPostOwnerUsername] = useState('')
     const [postTitle, setPostTitle] = useState('')
     const [postBody, setPostBody] = useState('')
 
     useEffect(() => {
+        const fetchUser = async () => {
+            const user = await Auth.currentUserInfo()
+            setPostOwnerId(user.id)
+            setPostOwnerUsername(user.username)
+        }
         
+        fetchUser()
     }, [])
 
     const handleAddPost = async (event) => {
