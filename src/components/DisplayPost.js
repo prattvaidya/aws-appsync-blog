@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { API, graphqlOperation } from 'aws-amplify'
-import { onCreatePost } from '../graphql/subscriptions'
+import { onCreatePost, onDeletePost } from '../graphql/subscriptions'
 import { listPosts } from '../graphql/queries'
 import { DeletePost } from './DeletePost'
 import { EditPost } from './EditPost'
@@ -13,12 +13,24 @@ export const DisplayPosts = () => {
         getPosts()
         const createPostListener = API.graphql(graphqlOperation(onCreatePost)).subscribe({
             next: postData => {
+                console.log("createpostlistener called");
                 const newPost = postData.value.data.onCreatePost
                 setPosts([...posts.filter(post => post.id !== newPost.id), newPost])
             }
         })
-        return createPostListener.unsubscribe
-    }, [])
+        const deletePostListener = API.graphql(graphqlOperation(onDeletePost)).subscribe({
+            next: postData => {
+                const deletedPost = postData.value.data.onDeletePost
+                console.log("deleted post",deletedPost);
+                console.log("posts",posts);
+                setPosts(posts.filter(post => post.id !== deletedPost.id))
+            }
+        })
+        return () => {
+            createPostListener.unsubscribe()
+            deletePostListener.unsubscribe()
+        } 
+    }, [posts])
 
     const getPosts = async () => {
         const result = await API.graphql(graphqlOperation(listPosts))
@@ -32,7 +44,7 @@ export const DisplayPosts = () => {
             <span style={{fontStyle: 'italic', color: '#0ca5e297'}}>Written by {post.postOwnerUsername} on <time style={{fontStyle: 'italic'}}>{new Date(post.createdAt).toDateString()}</time></span>
             <p>{post.postBody}</p>
             <span>
-                <DeletePost />
+                <DeletePost id={post.id} />
                 <EditPost />
             </span>
         </div>)}

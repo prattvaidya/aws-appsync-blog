@@ -1,7 +1,14 @@
+import { API, graphqlOperation } from 'aws-amplify'
 import React from 'react'
+import { deletePost } from '../graphql/mutations'
 
-export const DeletePost = () => {
+export const DeletePost = ({id}) => {
+    const handleDelete = async () => {
+        const input = { id }
+        await API.graphql(graphqlOperation(deletePost, {input}))
+    }
+    
     return (
-        <button>Delete</button>
+        <button onClick={handleDelete}>Delete</button>
     )
 }
