@@ -16,5 +16,13 @@
         }
       }
     }
+  },
+  "auth": {
+    "appsyncblog85518230": {
+      "service": "Cognito",
+      "providerPlugin": "awscloudformation",
+      "dependsOn": [],
+      "customAuth": false
+    }
   }
 }
