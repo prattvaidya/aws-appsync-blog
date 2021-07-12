@@ -38,7 +38,7 @@ export const DisplayPosts = () => {
 
                     console.log("updating post", updatedPost);
                     const index = posts.findIndex(post => post.id === updatedPost.id)
-                    const updatedPosts = [...posts.slice(0, index), updatedPost, ...posts.slice(index, posts.length)]
+                    const updatedPosts = [...posts.slice(0, index), updatedPost, ...posts.slice(index, posts.length - 1)]
                     setPosts(updatedPosts)
                 }
             }
