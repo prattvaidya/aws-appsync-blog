@@ -7,7 +7,7 @@ type Post @model {
 	createdAt: String
 	comments: [Comment] @connection(name: "PostComments") #relationship
 	likes: [Like] @connection(name: "PostLikes")
-}`'
+}
  
 type Comment @model {
 	id: ID!
