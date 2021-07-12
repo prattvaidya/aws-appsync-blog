@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { API, graphqlOperation } from 'aws-amplify'
-import { onCreatePost, onDeletePost } from '../graphql/subscriptions'
+import { onCreatePost, onDeletePost, onUpdatePost } from '../graphql/subscriptions'
 import { listPosts } from '../graphql/queries'
 import { DeletePost } from './DeletePost'
 import { EditPost } from './EditPost'
@@ -11,6 +11,10 @@ export const DisplayPosts = () => {
 
     useEffect(() => {
         getPosts()
+        
+    }, [])
+
+    useEffect(() => {
         const createPostListener = API.graphql(graphqlOperation(onCreatePost)).subscribe({
             next: postData => {
                 console.log("createpostlistener called");
@@ -26,13 +30,28 @@ export const DisplayPosts = () => {
                 setPosts(posts.filter(post => post.id !== deletedPost.id))
             }
         })
+        const updatePostListener = API.graphql(graphqlOperation(onUpdatePost)).subscribe({
+            next: postData => {
+                console.log("postData", postData);
+                const updatedPost = postData.value.data.onUpdatePost
+                if (updatedPost) {
+
+                    console.log("updating post", updatedPost);
+                    const index = posts.findIndex(post => post.id === updatedPost.id)
+                    const updatedPosts = [...posts.slice(0, index), updatedPost, ...posts.slice(index, posts.length)]
+                    setPosts(updatedPosts)
+                }
+            }
+        })
         return () => {
             createPostListener.unsubscribe()
             deletePostListener.unsubscribe()
+            updatePostListener.unsubscribe()
         } 
     }, [posts])
 
     const getPosts = async () => {
+        console.log("getting posts");
         const result = await API.graphql(graphqlOperation(listPosts))
         setPosts(result.data.listPosts.items)
     }
